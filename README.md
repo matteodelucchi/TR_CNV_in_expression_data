@@ -4,8 +4,6 @@ This repository contains pipelines to preprocess RNAseq `.bam` files for the ana
 ## Setup and Installation of Dependencies
 Download this repository
 ```bash
-mkdir TR_CNV_in_expression_data
-cd TR_CNV_in_expression_data
 git clone https://github.com/matteodelucchi/TR_CNV_in_expression_data.git
 ```
 
