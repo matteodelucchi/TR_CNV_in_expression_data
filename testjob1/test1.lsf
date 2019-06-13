@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#BSUB -q dev
+#BSUB -n 20
+#BSUB -W 00:30
+#BSUB -R "span[ptile=10]"
+#BSUB -e "test1.stderr.%J"
+#BSUB -o "test1.stdout.%J"
+#BSUB -J "test1"
+
+module load Anaconda3/2018.12-rhel-7  
+
+export PATH=$PATH:/dataT/dlc/tcga/colorectal/bam_files/primary_tumor
+
+./reference-based_mapping_pipeline.sh --input TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam --output test1.%J.bam
