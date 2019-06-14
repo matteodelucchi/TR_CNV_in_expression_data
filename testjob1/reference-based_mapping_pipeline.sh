@@ -34,7 +34,8 @@ echo "Processing:  ${infile}"
 # Mapped Read Data Filtering
 # ----------------------------
 echo "Mapped Read Data Filtering..."
-samtools view -b -q 10 -b ${infile} > aligned_reads.q10.bam
+samtools view -q 10 -b ${infile} > ${outfile}.aligned_reads.q10.bam
+samtools quickcheck ${outfile}.aligned_reads.q10.bam
 
 # ----------------------------
 # Short Tandem Repeat Calling
@@ -44,12 +45,15 @@ samtools view -b -q 10 -b ${infile} > aligned_reads.q10.bam
 echo "STR Calling..."
 
 echo "Prepare for HipSTR input (sort and index)..."
-samtools sort -o my_sorted.bam aligned_reads.q10.bam
-samtools index my_sorted.bam
+samtools sort -o ${outfile}.my_sorted.bam ${outfile}.aligned_reads.q10.bam
+samtools quickcheck ${outfile}.my_sorted.bam
+
+samtools index ${outfile}.my_sorted.bam
+samtools quickcheck ${outfile}.my_sorted.bam
 
 # Run HipSTR
 echo "Running HipSTR..."
-/dataT/dlc/programs/HipSTR/HipSTR --bams      my_sorted.bam \
+/dataT/dlc/programs/HipSTR/HipSTR --bams      ${outfile}.my_sorted.bam \
                                    --fasta     /dataT/dlc/data/all_chroms.fa \
                                    --regions   /dataT/dlc/data/hg19.hipstr_reference.bed \
                                    --str-vcf   ${outfile}.vcf.gz \
@@ -57,34 +61,51 @@ echo "Running HipSTR..."
                                    --viz-out   ${outfile}.viz.gz \
                                    --min-reads 25 --def-stutter-model \
 
-echo "Finished. Results in ${outfile}.vcf.gz"
 
-# # ----------------------------
-# # Generate Consensus Sequence
-# # ----------------------------
-# # https://samtools.github.io/bcftools/howtos/consensus-sequence.html
-# cat reference.fa | bcftools consensus calls.vcf.gz > consensus.fa
+# ----------------------------
+# Generate Consensus Sequence
+# ----------------------------
+# https://samtools.github.io/bcftools/howtos/consensus-sequence.html
+echo "Generating consensus sequence..."
+cat /dataT/dlc/data/all_chroms.fa | bcftools consensus ${outfile}.vcf.gz > ${outfile}.consensus.fa
 
-# # ----------------------------
-# # Extract Coding Sequence
-# # ----------------------------
-# # Cufflinks/EMBOSS transeq
-# extractfeat -type CDS -join -seqid -coords -retainids -matchdescstart -seqfile
-# $DESTINATION -force -o $OUT_FILE $REFERENCE
+# ----------------------------
+# Extract Coding Sequence
+# ----------------------------
+# Cufflinks/EMBOSS transeq
+# extractfeat -type CDS \
+#             -join \
+#             test1.features.fasta \
+#             /dataT/dlc/data/all_chroms.fa
+# extractfeat test1.consensus.fa test1.features.fasta
+# NOTE: This doesn't work!!!!! Keep on with all sequences, no only coding sequence
 
 # # ----------------------------
 # # Translation DNA -> AA
 # # ----------------------------
 # # Emboss transeq
-# transeq -sequence <input file> -outseq <output file> -frame 6 -clean
+echo "Translating DNA to AA..."
+transeq -sequence ${outfile}.consensus.fa -outseq ${outfile}.aa.fasta -frame 6 -clean
 # # or with Gotranseq
 # cpus=$( ls -d /sys/devices/system/cpu/cpu[[:digit:]]* | wc -w )
-# ./gotranseq --sequence <input file> --outseq <output file> --frame 6 --numcpu $cpus --clean
+# gotranseq --sequence <input file> --outseq <output file> --frame 6 --numcpu $cpus --clean
+# gotranseq --sequence test1.consensus.fa --outseq test1.aa.fasta --frame 6 --numcpu 4 --clean
+# NOTE: gotranseq shows strange behaviour: prints the DNA seq on the screen... if put in a file ...>out.gotranseq it takes ages and if interupted its a binary file...
+
 
 # # ----------------------------
 # # Transcript Annotation
 # # ----------------------------
-# BLASTX
-# # ----------------------------
-# # Tandem Repeat Annotation (TRAL)
-# # ----------------------------
+echo "Transcript annotation with BLASTp..."
+/dataT/dlc/programs/ncbi-blast-2.9.0+-src/c++/ReleaseMT/bin/blastp \
+    -query ${outfile}.aa.fasta \
+    -db swissprot.00 \
+    -out ${outfile}.blast.tab \
+    -outfmt 7
+
+# ----------------------------
+# Tandem Repeat Annotation (TRAL)
+# ----------------------------
+# TODO
+
+echo "Finished. Results in ${outfile}.blast.tab"
