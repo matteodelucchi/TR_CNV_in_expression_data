@@ -85,6 +85,17 @@ source ~/.bashrc
 # ----------------------------
 # Install EMBOSS
 # ----------------------------
+# EMBOSS for extractfeat
+cd /dataT/dlc/programs
+wget ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-6.6.0.tar.gz
+gunzip EMBOSS-6.6.0.tar.gz 
+tar xvf EMBOSS-6.6.0.tar
+rm -r EMBOSS-6.6.0.tar
+cd EMBOSS-6.6.0/
+./configure --build=ppc64le --prefix=/dataT/dlc/programs
+make
+make install
+
 # use new, parallelizable version:
 # https://github.com/feliixx/gotranseq
 # install go
