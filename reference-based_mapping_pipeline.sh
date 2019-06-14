@@ -28,83 +28,84 @@ while [ "$1" != "" ]; do
     shift
 done
 
-echo "Processing: [$infile]"
+echo "Processing:  ${infile}"
 
 # ----------------------------
 # Mapped Read Data Filtering
 # ----------------------------
 echo "Mapped Read Data Filtering..."
-samtools view -q 10 -b infile > aligned_reads.q10.bam
+samtools view -q 10 -b ${infile} > ${outfile}.aligned_reads.q10.bam
+samtools quickcheck ${outfile}.aligned_reads.q10.bam
 
 # ----------------------------
 # Short Tandem Repeat Calling
 # ----------------------------
 # https://hipstr-tool.github.io/HipSTR-tutorial/
 # Prepare for HipSTR input
-echo "STR Calling"
+echo "STR Calling..."
 
-echo "Prepare for HipSTR input (sort and index)"
-samtools sort -o my_sorted.bam aligned_reads.q10.bam
-samtools index > outfile.bam
+echo "Prepare for HipSTR input (sort and index)..."
+samtools sort -o ${outfile}.my_sorted.bam ${outfile}.aligned_reads.q10.bam
+samtools quickcheck ${outfile}.my_sorted.bam
 
-echo "Finished. Results in [$outfile]"
+samtools index ${outfile}.my_sorted.bam
+samtools quickcheck ${outfile}.my_sorted.bam
 
-# uncomment the chunck below
+# Run HipSTR
+echo "Running HipSTR..."
+/dataT/dlc/programs/HipSTR/HipSTR --bams      ${outfile}.my_sorted.bam \
+                                   --fasta     /dataT/dlc/data/all_chroms.fa \
+                                   --regions   /dataT/dlc/data/hg19.hipstr_reference.bed \
+                                   --str-vcf   ${outfile}.vcf.gz \
+                                   --log       ${outfile}.log \
+                                   --viz-out   ${outfile}.viz.gz \
+                                   --min-reads 25 --def-stutter-model \
 
 
+# ----------------------------
+# Generate Consensus Sequence
+# ----------------------------
+# https://samtools.github.io/bcftools/howtos/consensus-sequence.html
+echo "Generating consensus sequence..."
+cat /dataT/dlc/data/all_chroms.fa | bcftools consensus ${outfile}.vcf.gz > ${outfile}.consensus.fa
 
-
-# samtools index > my_sorted.bam
-
-
-# # Download human hg19 reference files in fasta format
-# mkdir fasta
-# cd fasta
-# wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
-# tar -xzvf chromFa.tar.gz
-# cat chr*.fa > all_chroms.fa
-# samtools faidx all_chroms.fa
-# cd ../
-
-# # Download human hg19 STR-reference file
-# wget https://github.com/HipSTR-Tool/HipSTR-references/raw/master/human/hg19.hipstr_reference.bed.gz
-# gunzip hg19.hipstr_reference.bed.gz
-
-# # Run HipSTR
-# ./HipSTR/HipSTR --bams      bams/ERR194147.bam,bams/ERR194160.bam,bams/ERR194161.bam,bams/SRR826427.bam,bams/SRR826428.bam,bams/SRR826448.bam,bams/SRR826463.bam,bams/SRR826465.bam,bams/SRR826467.bam,bams/SRR826469.bam,bams/SRR826471.bam,bams/SRR826473.bam
-#                 --fasta     fasta/all_chroms.fa
-#                 --regions   regions.bed
-#                 --str-vcf   trio.marshfield.vcf.gz
-#                 --log       trio.marshfield.log
-#                 --viz-out   trio.marshfield.viz.gz
-#                 --min-reads 25 --def-stutter-model
-
-# # ----------------------------
-# # Generate Consensus Sequence
-# # ----------------------------
-# # https://samtools.github.io/bcftools/howtos/consensus-sequence.html
-# cat reference.fa | bcftools consensus calls.vcf.gz > consensus.fa
-
-# # ----------------------------
-# # Extract Coding Sequence
-# # ----------------------------
-# # Cufflinks/EMBOSS transeq
-# extractfeat -type CDS -join -seqid -coords -retainids -matchdescstart -seqfile
-# $DESTINATION -force -o $OUT_FILE $REFERENCE
+# ----------------------------
+# Extract Coding Sequence
+# ----------------------------
+# Cufflinks/EMBOSS transeq
+# extractfeat -type CDS \
+#             -join \
+#             test1.features.fasta \
+#             /dataT/dlc/data/all_chroms.fa
+# extractfeat test1.consensus.fa test1.features.fasta
+# NOTE: This doesn't work!!!!! Keep on with all sequences, no only coding sequence
 
 # # ----------------------------
 # # Translation DNA -> AA
 # # ----------------------------
 # # Emboss transeq
-# transeq -sequence <input file> -outseq <output file> -frame 6 -clean
+echo "Translating DNA to AA..."
+transeq -sequence ${outfile}.consensus.fa -outseq ${outfile}.aa.fasta -frame 6 -clean
 # # or with Gotranseq
 # cpus=$( ls -d /sys/devices/system/cpu/cpu[[:digit:]]* | wc -w )
-# ./gotranseq --sequence <input file> --outseq <output file> --frame 6 --numcpu $cpus --clean
+# gotranseq --sequence <input file> --outseq <output file> --frame 6 --numcpu $cpus --clean
+# gotranseq --sequence test1.consensus.fa --outseq test1.aa.fasta --frame 6 --numcpu 4 --clean
+# NOTE: gotranseq shows strange behaviour: prints the DNA seq on the screen... if put in a file ...>out.gotranseq it takes ages and if interupted its a binary file...
+
 
 # # ----------------------------
 # # Transcript Annotation
 # # ----------------------------
-# BLASTX
-# # ----------------------------
-# # Tandem Repeat Annotation (TRAL)
-# # ----------------------------
+echo "Transcript annotation with BLASTp..."
+/dataT/dlc/programs/ncbi-blast-2.9.0+-src/c++/ReleaseMT/bin/blastp \
+    -query ${outfile}.aa.fasta \
+    -db swissprot.00 \
+    -out ${outfile}.blast.tab \
+    -outfmt 7
+
+# ----------------------------
+# Tandem Repeat Annotation (TRAL)
+# ----------------------------
+# TODO
+
+echo "Finished. Results in ${outfile}.blast.tab"
