@@ -1,4 +1,5 @@
 #!/bin/bash
+# submit this script to prodLongHost queue: bsub -q "prod.long" test1.lsf
 
 #BSUB -q dev
 #BSUB -n 20
@@ -12,4 +13,6 @@ module load Anaconda3/2018.12-rhel-7
 
 export PATH=$PATH:/dataT/dlc/tcga/colorectal/bam_files/primary_tumor
 
-./reference-based_mapping_pipeline.sh --input TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam --output test1.%J.bam
+chmod +x ./reference-based_mapping_pipeline.sh
+
+./reference-based_mapping_pipeline.sh --input TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam --output test1
