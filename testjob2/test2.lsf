@@ -1,0 +1,28 @@
+#!/bin/bash
+# submit this script to prodLongHost queue: bsub -q "prod.long" test1.lsf
+
+#BSUB -q dev
+#BSUB -n 20
+#BSUB -W 00:30
+#BSUB -R "span[ptile=10]"
+#BSUB -e "test1.stderr.%J"
+#BSUB -o "test1.stdout.%J"
+#BSUB -J "test1"
+
+module load Anaconda3/2018.12-rhel-7  
+
+export PATH=$PATH:/dataT/dlc/tcga/colorectal/bam_files/primary_tumor
+
+chmod +x ./reference-based_map_sort_filter.sh
+chmod +x ./reference-based_STR_calling_TR-annotation.sh
+
+
+./reference-based_map_sort_filter.sh --input /dataT/dlc/tcga/colorectal/bam_files/primary_tumor/TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam \
+                                     --output test2.1
+./reference-based_map_sort_filter.sh --input /dataT/dlc/tcga/colorectal/bam_files/blood_derived_normal/TCGA-A6-2686-10A-01D-2188-10_Illumina_gdc_realn.bam \
+                                     --output test2.2
+
+./reference-based_STR_calling_TR-annotation.sh \
+                                     --input1 test2.1.my_sorted.bam\
+                                     --input2 test2.2.my_sorted.bam
+                                     --output test2
