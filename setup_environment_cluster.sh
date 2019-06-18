@@ -66,10 +66,18 @@ make
 ./HipSTR --help
 
 # download reference proteome
-cd /dataT/dlc/data/
+mkdir /dataT/dlc/data/hg19
+cd /dataT/dlc/data/hg19
 wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
 tar -xzvf chromFa.tar.gz
 cat chr*.fa > all_chroms.fa
+samtools faidx all_chroms.fa
+
+mkdir /dataT/dlc/data/hg38
+cd /dataT/dlc/data/hg38
+wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz' -O chromFa.tar.gz
+tar -xzvf chromFa.tar.gz
+cat ./chroms/chr*.fa > ./all_chroms.fa
 samtools faidx all_chroms.fa
 
 # download regions .bed file with information about each STR.
@@ -77,7 +85,9 @@ samtools faidx all_chroms.fa
 # But this is a tutorial to create a new one: https://github.com/HipSTR-Tool/HipSTR-references/blob/master/human/human_reference.md
 cd /dataT/dlc/data/
 wget https://github.com/HipSTR-Tool/HipSTR-references/raw/master/human/hg19.hipstr_reference.bed.gz
-gunzip -k hg19.hipstr_reference.bed.gz
+wget https://github.com/HipSTR-Tool/HipSTR-references/raw/master/human/GRCh38.hipstr_reference.bed.gz
+wget https://github.com/HipSTR-Tool/HipSTR-references/raw/master/human/hg38.hipstr_reference.bed.gz
+gunzip *.hipstr_reference.bed.gz
 
 echo -e "\nexport PATH=$PATH:/dataT/dlc/data/" >> ~/.bashrc
 source ~/.bashrc
