@@ -176,3 +176,78 @@ python3 -m venv env_tral
 source env_tral/bin/activate
 cd /dataT/dlc/programs/tral_repository/tral/easy_setup
 ./setupTRAL.sh setup # yes to p-value download
+
+# TODO: Add workaround for HMMER4-devel
+
+# ----------------------------
+# Install Eigen
+# ----------------------------
+cd /dataT/dlc/programs
+wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
+tar xjf 3.3.7.tar.bz2
+rm 3.3.7.tar.bz2 
+cd eigen-eigen-323c052e1731/w
+mkdir build_dir
+cd build_dir
+cmake ../
+
+# ----------------------------
+# Install Cufflinks
+# ----------------------------
+module load Boost/1.67.0-ibmatcuda-10.10.1
+git clone https://github.com/cole-trapnell-lab/cufflinks.git
+cd cufflinks
+autoreconf --install
+./configure --prefix=/dataT/dlc/programs/cufflinks \
+            --with-boost=$MODULEPATH \
+            --with-eigen=/dataT/dlc/programs/eigen-eigen-323c052e1731/build_dir \
+            --with-bam=/dataT/dlc/samtools-1.9
+# NOTE: FAILED INSTALLATION
+# checking for bamlib... 
+# configure: error: We could not detect the bam libraries (version
+# or higher). If you have a staged bam library (still not installed) 
+# please specify $BAM_ROOT in your environment and do not give a PATH 
+# to --with-bam option.  If you are sure you have bam installed, 
+# then check your version number looking in <bam/version.hpp>. 
+# See http://randspringer.de/bam for more documentation.
+
+# make
+# make install
+# # test with:
+# wget http://cufflinks.cbcb.umd.edu/downloads/test_data.sam
+# cufflinks ./test_data.sam
+
+# wget http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-2.2.1.Linux_x86_64.tar.gz
+# tar zxvpf cufflinks-2.2.1.Linux_x86_64.tar.gz
+# rm cufflinks-2.2.1.Linux_x86_64.tar.gz
+# cd cufflinks-2.2.1.Linux_x86_64/
+# echo -e "\nexport PATH=$PATH:/dataT/dlc/programs/cufflinks-2.2.1.Linux_x86_64
+# " >> ~/.bashrc
+# wget http://cufflinks.cbcb.umd.edu/downloads/test_data.sam
+# cufflinks ./test_data.sam
+
+# ----------------------------
+# Install TransDecoder
+# ----------------------------
+cd /dataT/dlc/programs
+wget https://github.com/TransDecoder/TransDecoder/archive/TransDecoder-v5.5.0.tar.gz
+tar zxvpf TransDecoder-v5.5.0.tar.gz
+rm TransDecoder-v5.5.0.tar.gz
+cd TransDecoder-TransDecoder-v5.5.0/
+autoconf
+# NOTE: FAILED INSTALLATION requires Cufflinks (see above)
+# ./configure
+# # --build=ppc64le
+# make clean
+# make
+# make install
+
+
+# # other option with Conda
+# module load Anaconda3/2018.12-rhel-7
+# conda config --add channels defaults
+# conda config --add channels bioconda
+# conda config --add channels conda-forge
+# conda install transdecoder
+# conda update transdecoder
+# NOTE: is not in the conda package library
