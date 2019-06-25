@@ -1,0 +1,13 @@
+For each biospecimen there exist three RNA seq files:
+- blood tissue (healthy)
+- solid tissue (healthy)
+- primary tumor (not healthy)
+
+For each specimen, all three files are used in one run through the pipeline. 
+One run, is executed as one job. 
+Therefore, for each specimen a separate job is created. 
+This is set up by the file `job_submission_ref_based.sh`:
+    for each specimen,
+        mkdir specimen_name
+        create speciemen_name.lsf file
+    submit job array to "prod.long" queue
