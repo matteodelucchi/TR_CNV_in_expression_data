@@ -5,6 +5,7 @@
 # User-specific folders
 programs/
 data/
+tcga/
 
 # User-specific files
 *.rsuser
