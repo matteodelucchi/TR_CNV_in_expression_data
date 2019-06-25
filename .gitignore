@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 # User-specific folders
 programs/
+data/
 
 # User-specific files
 *.rsuser
@@ -11,6 +12,18 @@ programs/
 *.user
 *.userosscache
 *.sln.docstates
+*.fasta
+*.fa
+*.bam
+*.bai
+*.sam
+*.sai
+*.log
+*.viz.gz
+*.vcf.gz
+*.vcf.gz.cs*.vcf.gz.csi
+*.bed
+*.tab
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
