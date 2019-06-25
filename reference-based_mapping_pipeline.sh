@@ -48,12 +48,15 @@ echo "Prepare for HipSTR input (sort and index)..."
 samtools sort -o ${outfile}.my_sorted.bam ${outfile}.aligned_reads.q10.bam
 samtools quickcheck ${outfile}.my_sorted.bam
 
-samtools index ${outfile}.my_sorted.bam
-samtools quickcheck ${outfile}.my_sorted.bam
+samtools index ${outfile}.my_sorted.bam > ${outfile}.indexed.bam
+samtools quickcheck ${outfile}.indexed.bam
+
+# same as above but with pipeing
+samtools sort test1.aligend_reads.q10.bam | samtools index - > test1.indexed.bam
 
 # Run HipSTR
 echo "Running HipSTR..."
-/dataT/dlc/programs/HipSTR/HipSTR --bams      ${outfile}.my_sorted.bam \
+/dataT/dlc/programs/HipSTR/HipSTR --bams      ${outfile}.indexed.bam \
                                    --fasta     /dataT/dlc/data/all_chroms.fa \
                                    --regions   /dataT/dlc/data/hg19.hipstr_reference.bed \
                                    --str-vcf   ${outfile}.vcf.gz \
