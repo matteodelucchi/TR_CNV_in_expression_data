@@ -1,13 +1,14 @@
 #!/bin/bash
-# submit this script to prodLongHost queue: bsub -q "prod.long" test1.lsf
+# submit this script to prodLongHost queue: bsub -q "prod.long" < test2.lsf
 
 #BSUB -q dev
 #BSUB -n 20
-#BSUB -W 00:30
+#BSUB -u "delucmat@students.zhaw.ch"
+#BUSB -N
 #BSUB -R "span[ptile=10]"
-#BSUB -e "test1.stderr.%J"
-#BSUB -o "test1.stdout.%J"
-#BSUB -J "test1"
+#BSUB -e "test2.stderr.%J"
+#BSUB -o "test2.stdout.%J"
+#BSUB -J "test2"
 
 module load Anaconda3/2018.12-rhel-7  
 
@@ -23,6 +24,6 @@ chmod +x ./reference-based_STR_calling_TR-annotation.sh
                                      --output test2.2
 
 ./reference-based_STR_calling_TR-annotation.sh \
-                                     --input1 test2.1.my_sorted.bam\
-                                     --input2 test2.2.my_sorted.bam
+                                     --input1 test2.1.my_sorted.bam \
+                                     --input2 test2.2.my_sorted.bam \
                                      --output test2
