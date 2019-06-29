@@ -1,0 +1,23 @@
+#!/bin/bash
+# submit this script to prodLongHost queue: bsub -q "prod.long" < test_de_novo.lsf
+
+#BSUB -q dev
+#BSUB -n 20
+#BSUB -u "delucmat@students.zhaw.ch"
+#BUSB -N
+#BSUB -R "span[ptile=10]"
+#BSUB -e "test_de_novo.stderr.%J"
+#BSUB -o "test_de_novo.stdout.%J"
+#BSUB -J "test_de_novo"
+
+module load Anaconda3/2018.12-rhel-7 
+module load openjdk/1.8  
+
+export PATH=$PATH:/dataT/dlc/tcga/colorectal/bam_files/primary_tumor
+
+chmod +x ./reference-based_map_sort_filter.sh
+chmod +x ./reference-based_STR_calling_TR-annotation.sh
+
+
+./de-novo_assembly_STR_calling.sh --input /dataT/dlc/tcga/colorectal/bam_files/primary_tumor/TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam \
+                                  --output test_de_novo
