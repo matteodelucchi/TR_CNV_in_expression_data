@@ -251,3 +251,78 @@ autoconf
 # conda install transdecoder
 # conda update transdecoder
 # NOTE: is not in the conda package library
+
+
+# ----------------------------
+# Install Picard
+# ----------------------------
+cd /dataT/dlc/programs
+# git clone https://github.com/broadinstitute/picard.git
+# cd picard/
+# ./gradlew shadowJar
+# java -jar build/libs/picard.jar
+# ./gradlew clean
+# ./gradlew test
+# NOTE: didn't pass the tests
+
+# mkdir picard
+# cd ./picard/
+# wget https://github.com/broadinstitute/picard/releases/download/2.20.2/picard.jar
+# echo -e "\nexport PICARD=/dataT/dlc/programs/picard/picard.jar" >> ~/.bashrc
+# NOTE: Doesn't work due to processor architecture incompatibilities...
+# INFO	2019-06-27 10:59:29	SamToFastq	
+
+# ********** NOTE: Picard's command line syntax is changing.
+# **********
+# ********** For more information, please see:
+# ********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+# **********
+# ********** The command line looks like this in the new syntax:
+# **********
+# **********    SamToFastq -I /dataT/dlc/tcga/colorectal/bam_files/primary_tumor/TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam -FASTQ test_de_novo.fastq
+# **********
+
+
+# 10:59:30.037 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/ibm/gpfs-dataT/dlc/programs/picard/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+# 10:59:30.065 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (/tmp/dlc/libgkl_compression1486417447529522737.so: /tmp/dlc/libgkl_compression1486417447529522737.so: cannot open shared object file: No such file or directory (Possible cause: can't load AMD 64-bit .so on a Power PC 64 LE-bit platform))
+# 10:59:30.066 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/ibm/gpfs-dataT/dlc/programs/picard/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+# 10:59:30.071 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (/tmp/dlc/libgkl_compression7237514213767117405.so: /tmp/dlc/libgkl_compression7237514213767117405.so: cannot open shared object file: No such file or directory (Possible cause: can't load AMD 64-bit .so on a Power PC 64 LE-bit platform))
+# [Thu Jun 27 10:59:30 CEST 2019] SamToFastq INPUT=/dataT/dlc/tcga/colorectal/bam_files/primary_tumor/TCGA-A6-2685-01A-01D-1408-10_Illumina_gdc_realn.bam FASTQ=test_de_novo.fastq    OUTPUT_PER_RG=false COMPRESS_OUTPUTS_PER_RG=false RG_TAG=PU RE_REVERSE=true INTERLEAVE=false INCLUDE_NON_PF_READS=false CLIPPING_MIN_LENGTH=0 READ1_TRIM=0 READ2_TRIM=0 INCLUDE_NON_PRIMARY_ALIGNMENTS=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+# [Thu Jun 27 10:59:30 CEST 2019] Executing as dlc@zhcc068 on Linux 4.14.0-115.6.1.el7a.ppc64le ppc64le; OpenJDK 64-Bit Server VM 1.8.0_201-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.20.2-SNAPSHOT
+# 10:59:30.211 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+# [Thu Jun 27 10:59:30 CEST 2019] picard.sam.SamToFastq done. Elapsed time: 0.01 minutes.
+# Runtime.totalMemory()=81264640
+# To get help, see http://broadinstitute.github.io/picard/index.html#GettingHelp
+# Exception in thread "main" picard.PicardException: Input contains paired reads but no SECOND_END_FASTQ specified.
+# 	at picard.sam.SamToFastq.handleRecord(SamToFastq.java:303)
+# 	at picard.sam.SamToFastq.doWork(SamToFastq.java:192)
+# 	at picard.cmdline.CommandLineProgram.instanceMain(CommandLineProgram.java:295)
+# 	at picard.cmdline.PicardCommandLine.instanceMain(PicardCommandLine.java:103)
+# 	at picard.cmdline.PicardCommandLine.main(PicardCommandLine.java:113)
+
+
+
+# ----------------------------
+# Install Bedtools
+# ----------------------------
+# cd /dataT/dlc/programs
+# wget https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz
+# tar -zxvf bedtools-2.28.0.tar.gz
+# cd bedtools2
+# make
+# echo -e "\nexport PATH=$PATH:/dataT/dlc/programs/bedtools2/bin" >> ~/.bashrc
+# NOTE: Gives same error on multiple tested files:
+# [dlc@zhcc054 .../dlc/de-novo_assembly]$ bamToFastq -i /dataT/dlc/tcga/colorectal/bam_files/primary_tumor/TCGA-A6-2671-01A-01D-1408-10_hg19_Illumina_gdc_realn.bam -fq test_de-novo.fq
+# [E::bgzf_read] Read block operation failed with error 2 after 282 of 411 bytes
+
+# ----------------------------
+# Install Hydra
+# ----------------------------
+# cd /dataT/dlc/programs
+# wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/hydra-sv/Hydra.v0.5.3.tar.gz
+# tar -zxvf Hydra.v0.5.3.tar.gz 
+# cd Hydra-Version-0.5.3/
+# make clean
+# make all
+# echo -e "\nexport hydra=/dataT/dlc/programs/Hydra-Version-0.5.3/bin" >> ~/.bashrc
+# NOTE: installation successfull but doesn't work though...
