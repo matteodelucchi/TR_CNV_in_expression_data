@@ -95,7 +95,8 @@ echo "Transcript annotation with BLASTp..."
     -query ${outfile}.aa.fasta \
     -db swissprot.00 \
     -out ${outfile}.blast.tab \
-    -outfmt 7
+    -outfmt 7 \
+    -num_threads 15
 echo "Finished. Results in ${outfile}.blast.tab"
 
 # # ----------------------------
