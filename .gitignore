@@ -14,6 +14,8 @@ tcga/
 *.userosscache
 *.sln.docstates
 *.fasta
+*.fastq
+*.fq
 *.fa
 *.bam
 *.bai
